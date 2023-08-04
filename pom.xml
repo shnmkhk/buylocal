@@ -16,6 +16,8 @@
 	<description>Buy local goods &amp; services</description>
 	<properties>
 		<java.version>17</java.version>
+		<flyway.clean.skip>true</flyway.clean.skip>
+		<flyway.migrate.skip>true</flyway.migrate.skip>
 	</properties>
 	<pluginRepositories>
 		<pluginRepository>
@@ -59,7 +61,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>1.18.22</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -117,8 +119,9 @@
 						<configuration>
 							<url>${spring.datasource.url}</url>
 							<user>${spring.datasource.username}</user>
-							<password></password>
+							<password>${spring.datasource.password}</password>
 							<cleanDisabled>false</cleanDisabled>
+							<skip>${flyway.clean.skip}</skip>
 						</configuration>
 						<executions>
 							<execution>
@@ -143,12 +146,14 @@
 						<configuration>
 							<url>${spring.datasource.url}</url>
 							<user>${spring.datasource.username}</user>
-							<password></password>
+							<password>${spring.datasource.password}</password>
 							<cleanDisabled>false</cleanDisabled>
+							<skip>${flyway.clean.skip}</skip>
 						</configuration>
 						<executions>
 							<execution>
 								<goals>
+									<goal>clean</goal>
 									<goal>migrate</goal>
 								</goals>
 								<phase>process-resources</phase>
