@@ -16,8 +16,8 @@
 	<description>Buy local goods &amp; services</description>
 	<properties>
 		<java.version>17</java.version>
-		<flyway.clean.skip>true</flyway.clean.skip>
-		<flyway.migrate.skip>true</flyway.migrate.skip>
+                <db.install.skipped>true</db.install.skipped>
+                <db.clean.disabled>true</db.clean.disabled>
 	</properties>
 	<pluginRepositories>
 		<pluginRepository>
@@ -120,8 +120,8 @@
 							<url>${spring.datasource.url}</url>
 							<user>${spring.datasource.username}</user>
 							<password>${spring.datasource.password}</password>
-							<cleanDisabled>false</cleanDisabled>
-							<skip>${flyway.clean.skip}</skip>
+							<cleanDisabled>${db.clean.disabled}</cleanDisabled>
+							<skip>${db.install.skipped}</skip>
 						</configuration>
 						<executions>
 							<execution>
@@ -140,26 +140,6 @@
 			<id>prod</id>
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>org.flywaydb</groupId>
-						<artifactId>flyway-maven-plugin</artifactId>
-						<configuration>
-							<url>${spring.datasource.url}</url>
-							<user>${spring.datasource.username}</user>
-							<password>${spring.datasource.password}</password>
-							<cleanDisabled>false</cleanDisabled>
-							<skip>${flyway.clean.skip}</skip>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>clean</goal>
-									<goal>migrate</goal>
-								</goals>
-								<phase>process-resources</phase>
-							</execution>
-						</executions>
-					</plugin>
 				</plugins>
 			</build>
 		</profile>
