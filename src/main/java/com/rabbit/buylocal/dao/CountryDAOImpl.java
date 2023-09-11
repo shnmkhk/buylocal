@@ -1,10 +1,8 @@
 package com.rabbit.buylocal.dao;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -19,66 +17,65 @@ import com.rabbit.buylocal.model.Country;
 @Repository
 public class CountryDAOImpl implements CountryDAO {
 
-    @Autowired
-    private DataSource dataSource;
+	@Autowired
+	private DataSource dataSource;
 
-    public List<Country> fetchAll() {
-        // Create a ResultSetHandler implementation to convert the
-        // first row into an Object[].
-        ResultSetHandler<List<Country>> h = new ResultSetHandler<List<Country>>() {
-            public List<Country> handle(ResultSet rs) throws SQLException {
-                if (!rs.next()) {
-                    return null;
-                }
-                List<Country> list = new ArrayList<>();
-                do {
-                    list.add(new Country(rs.getInt(1), rs.getString(2)));
-                } while (rs.next());
-                return list;
-            }
-        };
+	private QueryRunner qr = null;
 
-        // Create a QueryRunner that will use connections from
-        // the given DataSource
-        QueryRunner run = new QueryRunner(dataSource);
+	private QueryRunner getQR() {
+		if (qr == null) {
+			qr = new QueryRunner(dataSource);
+		}
+		return qr;
+	}
 
-        // Execute the query and get the results back from the handler
-        try {
-            List<Country> result = run.query(
-                    "SELECT * FROM Country", h);
-            System.out.println("Countries: " + result);
-            return result;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+	public List<Country> fetchAll() {
+		// Execute the query and get the results back from the handler
+		try {
+			List<Country> result = getQR().query("SELECT * FROM Country", listRsHandler);
+			System.out.println("Countries: " + result);
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-    @Override
-    public Country fetchById(long id) {
-    // Create a ResultSetHandler implementation to convert the
-        // first row into an Object[].
-        ResultSetHandler<Country> h = new ResultSetHandler<Country>() {
-            public Country handle(ResultSet rs) throws SQLException {
-                if (!rs.next()) {
-                    return null;
-                }
-                return new Country(rs.getInt(1), rs.getString(2));
-            }
-        };
+	@Override
+	public Country fetchById(long id) {
+		// Execute the query and get the results back from the handler
+		try {
+			Country result = getQR().query("SELECT * FROM Country where id=?", objRsHandler, id);
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-        // Create a QueryRunner that will use connections from
-        // the given DataSource
-        QueryRunner run = new QueryRunner(dataSource);
+	// Create a ResultSetHandler implementation to convert the
+	// first row into an Object[].
+	private static final ResultSetHandler<List<Country>> listRsHandler = new ResultSetHandler<List<Country>>() {
+		public List<Country> handle(ResultSet rs) throws SQLException {
+			if (!rs.next()) {
+				return null;
+			}
+			List<Country> list = new ArrayList<>();
+			do {
+				list.add(Country.of(rs.getInt(1), rs.getString(2)));
+			} while (rs.next());
+			return list;
+		}
+	};
 
-        // Execute the query and get the results back from the handler
-        try {
-            Country result = run.query(
-                    "SELECT * FROM Country where id=?", h, id);
-            return result;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+	// Create a ResultSetHandler implementation to convert the
+	// first row into an Object[].
+	private static final ResultSetHandler<Country> objRsHandler = new ResultSetHandler<Country>() {
+		public Country handle(ResultSet rs) throws SQLException {
+			if (!rs.next()) {
+				return null;
+			}
+			return Country.of(rs.getInt(1), rs.getString(2));
+		}
+	};
 }
